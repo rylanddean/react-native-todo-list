@@ -16,6 +16,7 @@ import {
 import uuid from 'uuid';
 import List from './app/components/list';
 import AddTodo from './app/components/addTodo';
+import EditModal from './app/components/editModal';
 
 export default class App extends Component{
 
@@ -27,7 +28,8 @@ export default class App extends Component{
 
     // Bind filter function to this component
     this.filterToDos = this.filterToDos.bind(this);
-    this.updateActiveCount = this.updateActiveCount.bind(this);
+    this.updateCounters = this.updateCounters.bind(this);
+    this.syncToDoArrays = this.syncToDoArrays.bind(this);
 
     this.state = {
       todos: [
@@ -51,27 +53,39 @@ export default class App extends Component{
         
       ],
       activeCount: 0,
+      completedCount: 0,
+      allCount: 0,
+      editText: '',
+      editID: '',
+      visibleModal: false,
     }
   }
 
   // Update active to-do count
-  updateActiveCount(){
+  updateCounters(){
     this.setState({activeCount:(this.state.todos.filter(todo => todo.state === 'active').length)});
+    this.setState({completedCount:(this.state.todos.filter(todo => todo.state === 'completed').length)});
+    this.setState({allCount:(this.state.todos).length});
   }
 
   // Run active count on load
   componentWillMount(){
     let todos = this.state.todos;
-    this.updateActiveCount();
-    this.setState({displayedToDos:todos});
-}
+    this.updateCounters();
+    this.syncToDoArrays();
+  }
+
+  //Sync todos and displayedToDos arrays
+  syncToDoArrays(){
+    this.setState({displayedToDos:this.state.todos});
+  }
 
   // Get todos and append the new todo from the textInput element
   handleAddToDo(todo){
     let todos = this.state.todos;
     todos.push(todo);
     this.setState({todos:todos});
-    this.updateActiveCount();
+    this.updateCounters();
   }
 
   // On filter button press, filter to-dos on the state
@@ -79,7 +93,7 @@ export default class App extends Component{
     currentFilter = state;
     let todos = this.state.todos;
     if (state == 'all'){
-      this.setState({displayedToDos:todos});
+      this.syncToDoArrays();
     }else{
       this.setState({displayedToDos:todos.filter(todo => todo.state === state)});
     }
@@ -92,7 +106,7 @@ export default class App extends Component{
     todos.splice(index, 1);
     this.setState({todos:todos});
     this.filterToDos(currentFilter);
-    this.updateActiveCount();
+    this.updateCounters();
   }
 
   // Get todos and update the selected todo's state to completed then update the array
@@ -101,7 +115,7 @@ export default class App extends Component{
     let index = todos.findIndex(x => x.id === id);
     todos[index].state = 'completed';
     this.filterToDos(currentFilter);
-    this.updateActiveCount();
+    this.updateCounters();
   }
 
   // Get todos and update the selected todo's state to active then update the array
@@ -110,7 +124,32 @@ export default class App extends Component{
     let index = todos.findIndex(x => x.id === id);
     todos[index].state = 'active';
     this.filterToDos(currentFilter);
-    this.updateActiveCount();
+    this.updateCounters();
+  }
+
+  // Get todo text and populate the edit textinput
+  handleEditToDo(id){
+    let todos = this.state.todos;
+    let index = todos.findIndex(x => x.id === id);
+    this.setState({editText:todos[index].text});
+    this.setState({editID:todos[index].id});
+    this.setState({visibleModal:true});
+  }
+
+  // Update visible state on modal close
+  handleModalClose(visible){
+    console.log(visible);
+    this.setState({visibleModal:visible});
+
+  }
+
+  // Update todo with new text from edit textinput
+  handleUpdateToDoText(updatedtodo){
+    let todos = this.state.todos;
+    let index = todos.findIndex(x => x.id === updatedtodo.id);
+    this.state.todos[index].text = updatedtodo.text;
+    this.setState({visibleModal:false});
+    this.syncToDoArrays();
   }
 
   render() {
@@ -120,29 +159,28 @@ export default class App extends Component{
         /* Header - Start */
         <View style={styles.header}>
           <Text style={styles.headerText}>To-Do List</Text>
-          <Text style={styles.counterText}>{this.state.activeCount}</Text>
         </View>
         /* Header - End */
 
         /* Filter - Start */
         <View style={styles.filters}>
-            <Button style={styles.filterText} title="All" onPress={this.filterToDos.bind(this,"all")}></Button>
-            <Button style={styles.filterText} title="Active" onPress={this.filterToDos.bind(this,"active")}></Button>
-            <Button style={styles.filterText} title="Completed" onPress={this.filterToDos.bind(this,"completed")}></Button>
-          </View>
+          <Button style={styles.filterText} title={`All(${this.state.allCount})`} onPress={this.filterToDos.bind(this,"all")}></Button>
+          <Button style={styles.filterText} title={`Active(${this.state.activeCount})`} onPress={this.filterToDos.bind(this,"active")}></Button>
+          <Button style={styles.filterText} title={`Completed(${this.state.completedCount})`} onPress={this.filterToDos.bind(this,"completed")}></Button>
+        </View>
         /* Filter - End */
         
         /* ToDo List Component - Start */
-        <List todos={this.state.displayedToDos} filter={currentFilter} onDelete={this.handleDeleteToDo.bind(this)} onComplete={this.handleCompleteToDo.bind(this)} onRestore={this.handleRestoreToDo.bind(this)} />
+        <List todos={this.state.displayedToDos} filter={currentFilter} onDelete={this.handleDeleteToDo.bind(this)} onComplete={this.handleCompleteToDo.bind(this)} onRestore={this.handleRestoreToDo.bind(this)} onEdit={this.handleEditToDo.bind(this)} />
         /* ToDo List Component - End */
 
         /* Add Item Component - Start */
         <AddTodo addToDo={this.handleAddToDo.bind(this)}/>
         /* Footer - End */
 
-        /* Edit Modal - Start */
-
-        /* Edit Modal - End */
+        /* Edit Modal Component - Start */
+        <EditModal onClose={this.handleModalClose.bind(this)} editToDo={this.handleUpdateToDoText.bind(this)} text={this.state.editText} id={this.state.editID} visible={this.state.visibleModal} />
+        /* Edit Modal Component - End */
       </View>
     );
   }
@@ -173,8 +211,13 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     width: "100%",
-    paddingLeft: 20,
+    paddingLeft: 10,
+    paddingBottom: 10,
     alignItems: "flex-start",
+    width: "100%",
+  },
+  filterText: {
+    textAlign: "left",
   },
   counterText: {
     fontSize: 30,

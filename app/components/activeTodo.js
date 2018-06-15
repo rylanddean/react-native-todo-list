@@ -26,11 +26,15 @@ export default class ActiveToDo extends Component{
     this.props.onComplete(id);
   }
 
+  editToDo(id){
+    this.props.onEdit(id);
+  }
+
   render() {
     return (
       <View style={styles.activetodo} key={this.props.key}>
         <Text style={styles.activetodoText}>{this.props.todo.text}</Text>
-        <TouchableOpacity onPress={this.props.editMethod} style={styles.actionButton}>
+        <TouchableOpacity onPress={this.editToDo.bind(this, this.props.todo.id)} style={styles.actionButton}>
           <Text style={[styles.editButtonText,styles.buttonText]}>E</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={this.deleteToDo.bind(this, this.props.todo.id)} style={styles.actionButton}>

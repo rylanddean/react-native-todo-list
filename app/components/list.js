@@ -34,25 +34,25 @@ export default class List extends Component{
     this.props.onRestore(id);
   }
 
+  editToDo(id){
+    this.props.onEdit(id);
+  }
+
   render() {
     let toDoItems;
     if(this.props.todos){
       toDoItems = this.props.todos.map(todo => {
-        console.log(todo.state);
         if(todo.state == 'completed'){
-          console.log('Winning');
           return (
             <CompletedToDo state={todo.state} onDelete={this.deleteToDo.bind(this)} onRestore={this.restoreToDo.bind(this)} key={todo.id} todo={todo} />
           );
         }else{
           return (
-            <ActiveToDo state={todo.state} onDelete={this.deleteToDo.bind(this)} onComplete={this.completeToDo.bind(this)} key={todo.id} todo={todo} />
+            <ActiveToDo state={todo.state} onDelete={this.deleteToDo.bind(this)} onComplete={this.completeToDo.bind(this)} onEdit={this.editToDo.bind(this)} key={todo.id} todo={todo} />
           );
         }
       });
     }
-
-    console.log(toDoItems);
 
     return (
       <View style={styles.listContainer} contentContainerStyle="flex-start">

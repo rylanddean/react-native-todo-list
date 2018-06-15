@@ -62,7 +62,7 @@ export default class AddTodo extends Component{
 // addToDo Stylesheet
 const styles = StyleSheet.create({
   footer: {
-    flex: 2,
+    flex: 3,
     width: "100%",
     flexDirection: "column",
     alignItems: "flex-start",
