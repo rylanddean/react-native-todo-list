@@ -10,10 +10,8 @@ import {
   StyleSheet,
   View,
   Button,
-  Text,
-  Modal
+  Text
 } from 'react-native';
-import uuid from 'uuid';
 import List from './app/components/list';
 import AddTodo from './app/components/addTodo';
 import EditModal from './app/components/editModal';
@@ -32,23 +30,7 @@ export default class App extends Component{
     this.syncToDoArrays = this.syncToDoArrays.bind(this);
 
     this.state = {
-      todos: [
-        {
-          id: uuid.v4(),
-          text: 'Testing',
-          state: 'active'
-        },
-        {
-          id: uuid.v4(),
-          text: 'Working',
-          state: 'active'
-        },
-        {
-          id: uuid.v4(),
-          text: 'Hello',
-          state: 'active'
-        }
-      ],
+      todos: [],
       displayedToDos: [
         
       ],
@@ -62,13 +44,14 @@ export default class App extends Component{
   }
 
   // Fetch todo list object from jsonplaceholder via AJAX call
-  /*
   getTodos(){
-    fetch('https://my-json-server.typicode.com/rylanddean/todo-json')
+    fetch('https://my-json-server.typicode.com/rylanddean/todo-json/todos')
       .then(res => res.json())
       .then(
         (result) => {
-          
+          this.setState({todos:result});
+          this.syncToDoArrays();
+          this.updateCounters();
           console.log(result);
         },
         (error) => {
@@ -76,7 +59,6 @@ export default class App extends Component{
         }
       )
   }
-  */
 
   // Update active to-do count
   updateCounters(){
@@ -85,11 +67,9 @@ export default class App extends Component{
     this.setState({allCount:(this.state.todos).length});
   }
 
-  // Run active count on load
-  componentWillMount(){
-    //this.getTodos();
-    this.updateCounters();
-    this.syncToDoArrays();
+  // Run after render
+  componentDidMount(){
+    this.getTodos();
   }
 
   //Sync todos and displayedToDos arrays
