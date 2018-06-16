@@ -32,7 +32,7 @@ export default class CompletedToDo extends Component{
 
   render() {
     return (
-      <View style={styles.completedtodo} key={this.props.key}>
+      <View style={styles.completedtodo} key={this.props.id}>
         <Text style={styles.completedtodoText}>{this.props.todo.text}</Text>
         <TouchableOpacity disabled={true} onPress={this.props.editMethod} style={styles.actionButton}>
           <Text style={[styles.editButtonText,styles.buttonText]}>E</Text>

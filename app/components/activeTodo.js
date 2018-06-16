@@ -17,7 +17,7 @@ export default class ActiveToDo extends Component{
   constructor(props){
     super(props);
   }
-
+  
   deleteToDo(id){
     this.props.onDelete(id);
   }
@@ -32,7 +32,7 @@ export default class ActiveToDo extends Component{
 
   render() {
     return (
-      <View style={styles.activetodo} key={this.props.key}>
+      <View style={styles.activetodo} key={this.props.id}>
         <Text style={styles.activetodoText}>{this.props.todo.text}</Text>
         <TouchableOpacity onPress={this.editToDo.bind(this, this.props.todo.id)} style={styles.actionButton}>
           <Text style={[styles.editButtonText,styles.buttonText]}>E</Text>
