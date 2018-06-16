@@ -61,6 +61,23 @@ export default class App extends Component{
     }
   }
 
+  // Fetch todo list object from jsonplaceholder via AJAX call
+  /*
+  getTodos(){
+    fetch('https://my-json-server.typicode.com/rylanddean/todo-json')
+      .then(res => res.json())
+      .then(
+        (result) => {
+          
+          console.log(result);
+        },
+        (error) => {
+          console.log(error);
+        }
+      )
+  }
+  */
+
   // Update active to-do count
   updateCounters(){
     this.setState({activeCount:(this.state.todos.filter(todo => todo.state === 'active').length)});
@@ -70,7 +87,7 @@ export default class App extends Component{
 
   // Run active count on load
   componentWillMount(){
-    let todos = this.state.todos;
+    //this.getTodos();
     this.updateCounters();
     this.syncToDoArrays();
   }
@@ -138,7 +155,6 @@ export default class App extends Component{
 
   // Update visible state on modal close
   handleModalClose(visible){
-    console.log(visible);
     this.setState({visibleModal:visible});
 
   }

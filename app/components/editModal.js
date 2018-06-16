@@ -19,11 +19,12 @@ export default class EditModal extends Component{
   constructor(props){
     super(props);
     this.state = {
-      text: '',
+      text: this.props.text,
       editToDo: {},
     }
   }
 
+  // On textInput change update the text state
   updateText(text){
     this.setState({text:text});
   };
@@ -33,6 +34,10 @@ export default class EditModal extends Component{
     if((this.state.editToDo === '')||(this.state.editToDo === undefined)){
       alert('Text is required');
     }else{
+      // Check if state text is empty
+      if(this.state.text === ''){
+        this.state.text = this.props.text;
+      }
       // Populate the edit to-do state with the textInput data
       this.setState({editToDo:{
         id: this.props.id,
